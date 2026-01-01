@@ -1,0 +1,44 @@
+services:
+  keycloak-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak228f937h
+      POSTGRES_PASSWORD: keycloakpassa90s8d3iuh
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    environment:
+      # Admin user for first login:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      # Tell Keycloak how to reach its DB:
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak228f937h
+      KC_DB_PASSWORD: keycloakpassa90s8d3iuh
+
+      KC_PROXY: edge
+      # Disable strict‐hostname checks so it binds to 0.0.0.0:
+      KC_HOSTNAME_STRICT: "false"
+    command:
+      - start-dev
+      - --proxy=edge
+      - --http-relative-path=/keycloak
+      - --db=postgres
+      - --db-url-host=keycloak-db
+      - --db-url-database=keycloak
+      - --db-username=keycloak228f937h
+      - --db-password=keycloakpassa90s8d3iuh
+      - --hostname-strict=false
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak-db
+
+volumes:
+  keycloak_data:
